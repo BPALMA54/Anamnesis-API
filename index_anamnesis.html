@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anamnesis en Psicodiagnóstico — Docente Bryan Palma</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4fa;color:#1a1a2e;min-height:100vh}
+:root{--azul:#1B3A6B;--azul2:#2E5FA3;--azul3:#D6E4F7;--verde:#1A6B3A;--verde2:#D6F0E0;--naranja:#C25E00;--naranja2:#FFF0D6;--morado:#4A1D96;--morado2:#EDE9FE;--rojo:#991B1B;--rojo2:#FEE2E2;--borde:#C5D1E0}
+.screen{display:none;min-height:100vh}.screen.active{display:block}
+header{background:var(--azul);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100}
+.header-title{font-size:16px;font-weight:700}.header-sub{font-size:11px;opacity:.8;margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:.2s}
+.btn-primary{background:var(--azul2);color:#fff}.btn-primary:hover{background:var(--azul)}
+.btn-success{background:var(--verde);color:#fff}.btn-success:hover{background:#145c2e}
+.btn-outline{background:#fff;color:var(--azul2);border:2px solid var(--azul2)}.btn-outline:hover{background:var(--azul3)}
+.btn-morado{background:var(--morado);color:#fff}.btn-naranja{background:var(--naranja);color:#fff}
+.btn-sm{padding:7px 14px;font-size:13px}
+.card{background:#fff;border-radius:14px;border:1px solid var(--borde);padding:22px;margin-bottom:16px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-azul{background:var(--azul3);color:var(--azul)}.badge-verde{background:var(--verde2);color:var(--verde)}
+.badge-naranja{background:var(--naranja2);color:var(--naranja)}.badge-morado{background:var(--morado2);color:var(--morado)}
+input,textarea,select{width:100%;padding:10px 14px;border:1.5px solid var(--borde);border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:.2s}
+input:focus,textarea:focus,select:focus{border-color:var(--azul2);box-shadow:0 0 0 3px rgba(46,95,163,.15)}
+textarea{resize:vertical;min-height:90px}
+.field-label{display:block;font-size:13px;font-weight:600;color:var(--azul);margin-bottom:6px;margin-top:14px}
+.area-header{background:var(--azul);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:700;margin:18px 0 12px;display:flex;align-items:center;gap:8px}
+.nivel-box{border-radius:12px;padding:18px;margin-bottom:14px}
+.nb-azul{background:var(--azul3);border-left:5px solid var(--azul2)}
+.nb-naranja{background:var(--naranja2);border-left:5px solid var(--naranja)}
+.nb-morado{background:var(--morado2);border-left:5px solid var(--morado)}
+.nb-verde{background:var(--verde2);border-left:5px solid var(--verde)}
+.tp{font-size:14px;line-height:1.8;color:#334155;margin-bottom:8px}
+.progress-bar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin:8px 0 16px}
+.progress-fill{height:100%;background:var(--azul2);border-radius:4px;transition:width .4s}
+.feedback-box{padding:14px 18px;border-radius:10px;margin-top:14px;font-size:14px;line-height:1.7}
+.fb-ok{background:var(--verde2);border-left:4px solid var(--verde);color:#14532d}
+.fb-mal{background:var(--rojo2);border-left:4px solid #dc2626;color:#7f1d1d}
+.qopt{display:block;width:100%;text-align:left;padding:12px 16px;margin-bottom:8px;background:#f8fafc;border:1.5px solid var(--borde);border-radius:10px;cursor:pointer;font-size:14px;transition:.2s;font-family:inherit}
+.qopt:hover{border-color:var(--azul2);background:var(--azul3)}
+.qopt.correcto{background:#d1fae5;border-color:#059669;color:#065f46;font-weight:600}
+.qopt.incorrecto{background:#fee2e2;border-color:#dc2626;color:#991b1b}
+.qopt.mostrar{background:#d1fae5;border-color:#059669;color:#065f46}
+.sesion-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:16px}
+.sesion-card{background:#fff;border:1.5px solid var(--borde);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:.2s}
+.sesion-card:hover{border-color:var(--azul2);background:var(--azul3);transform:translateY(-2px)}
+.sesion-card.done{border-color:var(--verde);background:var(--verde2)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px}
+.modal{background:#fff;border-radius:16px;padding:28px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto}
+table.at{width:100%;border-collapse:collapse;font-size:12px}
+table.at th{background:var(--azul);color:#fff;padding:9px 10px;text-align:left;white-space:nowrap}
+table.at td{padding:8px 10px;border-bottom:1px solid var(--borde);vertical-align:top;word-break:break-word;max-width:160px}
+table.at tr:nth-child(even) td{background:#f8fafc}
+.req{color:#dc2626;margin-left:2px}
+hr.sep{border:none;border-top:2px solid var(--azul3);margin:20px 0}
+</style>
+</head>
+<body>
+
+<!-- INICIO -->
+<div id="screen-inicio" class="screen active">
+<header>
+  <div><div class="header-title">🧠 Anamnesis en Psicodiagnóstico</div><div class="header-sub">Docente: Bryan Palma | Campus María Auxiliadora</div></div>
+  <button class="btn btn-outline btn-sm" onclick="abrirAdmin()">🔒 Panel Docente</button>
+</header>
+<div style="max-width:860px;margin:0 auto;padding:28px 20px">
+  <div style="text-align:center;margin-bottom:28px">
+    <div style="font-size:48px;margin-bottom:12px">📋</div>
+    <h1 style="font-size:24px;font-weight:800;color:var(--azul);margin-bottom:8px">Aprende Anamnesis Clínica</h1>
+    <p style="color:#64748b;font-size:15px">Domina el levantamiento de información en psicodiagnóstico</p>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <label class="field-label" style="margin-top:0">👤 Tu nombre completo (requerido para el registro):</label>
+    <div style="display:flex;gap:10px">
+      <input type="text" id="nombre-estudiante" placeholder="Ej: María Pérez" style="flex:1">
+      <button class="btn btn-primary" onclick="guardarNombre()">Guardar</button>
+    </div>
+    <div id="nombre-ok" style="display:none;margin-top:8px;color:var(--verde);font-size:13px;font-weight:600">✅ Nombre guardado. ¡Puedes comenzar!</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+    <div class="card" style="border-top:5px solid var(--azul2);cursor:pointer;text-align:center" onclick="ir('teoria')">
+      <div style="font-size:32px;margin-bottom:10px">📖</div>
+      <div style="font-weight:700;color:var(--azul);margin-bottom:6px">Marco Teórico</div>
+      <div style="font-size:13px;color:#64748b">Todo sobre la anamnesis clínica en psicodiagnóstico</div>
+      <div style="margin-top:12px"><span class="badge badge-azul">Comienza aquí</span></div>
+    </div>
+    <div class="card" style="border-top:5px solid var(--verde);cursor:pointer;text-align:center" onclick="ir('sesiones')">
+      <div style="font-size:32px;margin-bottom:10px">✍️</div>
+      <div style="font-weight:700;color:var(--verde);margin-bottom:6px">Mis Anamnesis</div>
+      <div style="font-size:13px;color:#64748b">Completa 3 anamnesis con pacientes reales y sube evidencias</div>
+      <div style="margin-top:12px"><span class="badge badge-verde">3 sesiones</span></div>
+    </div>
+    <div class="card" style="border-top:5px solid var(--naranja);cursor:pointer;text-align:center" onclick="ir('quiz')">
+      <div style="font-size:32px;margin-bottom:10px">🎯</div>
+      <div style="font-weight:700;color:var(--naranja);margin-bottom:6px">Quiz de Refuerzo</div>
+      <div style="font-size:13px;color:#64748b">Identifica áreas y componentes de la anamnesis</div>
+      <div style="margin-top:12px"><span class="badge badge-naranja">Juego 1</span></div>
+    </div>
+    <div class="card" style="border-top:5px solid var(--morado);cursor:pointer;text-align:center" onclick="ir('datoperdido')">
+      <div style="font-size:32px;margin-bottom:10px">🔎</div>
+      <div style="font-weight:700;color:var(--morado);margin-bottom:6px">El Dato Perdido</div>
+      <div style="font-size:13px;color:#64748b">Detecta errores e información faltante en anamnesis reales</div>
+      <div style="margin-top:12px"><span class="badge badge-morado">Juego 2</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TEORÍA -->
+<div id="screen-teoria" class="screen">
+<header>
+  <div><div class="header-title">📖 Marco Teórico — Anamnesis</div><div class="header-sub">Psicodiagnóstico Práctica | Docente: Bryan Palma</div></div>
+  <button class="btn btn-outline btn-sm" onclick="ir('inicio')">← Inicio</button>
+</header>
+<div style="max-width:820px;margin:0 auto;padding:28px 20px">
+  <div class="card">
+    <div class="nivel-box nb-azul">
+      <h4 style="color:var(--azul);font-size:16px;margin-bottom:10px">¿Qué es la anamnesis?</h4>
+      <p class="tp">La anamnesis es la recopilación sistemática y estructurada de la historia del paciente, obtenida principalmente a través de la entrevista clínica. Es uno de los instrumentos fundamentales del proceso psicodiagnóstico porque permite al clínico construir una comprensión integral de la persona antes de aplicar cualquier prueba o emitir hipótesis diagnósticas.</p>
+      <p class="tp">El término proviene del griego <em>anamnesis</em>, que significa <strong>"recordar, traer al presente"</strong>. En clínica, implica recuperar toda la información relevante de la historia del paciente: su pasado, su presente y el contexto en que se desarrolla su problemática.</p>
+    </div>
+    <h3 style="font-size:16px;font-weight:700;color:var(--azul);margin-bottom:14px;padding-bottom:6px;border-bottom:2px solid var(--azul3)">📌 Áreas de la Anamnesis</h3>
+    <div class="nivel-box nb-azul">
+      <h4 style="color:var(--azul);margin-bottom:8px">1. Datos de Identificación</h4>
+      <p class="tp">Nombre completo, edad, sexo, estado civil, nivel educativo, ocupación, lugar de residencia, fecha de evaluación. Son la base que permite contextualizar toda la información posterior y establecer el perfil sociodemográfico del paciente.</p>
+    </div>
+    <div class="nivel-box nb-naranja">
+      <h4 style="color:var(--naranja);margin-bottom:8px">2. Motivo de Consulta</h4>
+      <p class="tp">La razón por la que el paciente acude, preferiblemente en sus propias palabras. Es el punto de partida de todo el proceso psicodiagnóstico. Se registra textualmente lo que el paciente dice, sin interpretación clínica del evaluador. Puede diferir de lo que derive el análisis posterior.</p>
+    </div>
+    <div class="nivel-box nb-morado">
+      <h4 style="color:var(--morado);margin-bottom:8px">3. Historia del Problema Actual</h4>
+      <p class="tp">Cuándo comenzó el problema, cómo se desarrolló cronológicamente, qué factores lo precipitaron, qué lo agrava, qué lo alivia, con qué frecuencia e intensidad se presenta. Incluye los intentos previos de solución por parte del paciente o su familia.</p>
+    </div>
+    <div class="nivel-box nb-verde">
+      <h4 style="color:var(--verde);margin-bottom:8px">4. Historia Personal y del Desarrollo</h4>
+      <p class="tp">Embarazo y condiciones del parto, hitos del desarrollo psicomotor y del lenguaje, historia escolar (rendimiento, relaciones, cambios), relaciones tempranas y figuras de apego, traumas o eventos significativos en la infancia y adolescencia, historia sexual si es clínicamente relevante, enfermedades importantes en la historia de vida.</p>
+    </div>
+    <div class="nivel-box nb-azul">
+      <h4 style="color:var(--azul);margin-bottom:8px">5. Historia Familiar</h4>
+      <p class="tp">Composición del núcleo familiar, tipo de vínculos y dinámicas relacionales, antecedentes psicopatológicos en la familia (depresión, esquizofrenia, adicciones, etc.), figuras de apego primarias y secundarias, eventos familiares significativos (duelos, separaciones, migraciones, violencia).</p>
+    </div>
+    <div class="nivel-box nb-naranja">
+      <h4 style="color:var(--naranja);margin-bottom:8px">6. Historia Médica</h4>
+      <p class="tp">Enfermedades previas y actuales, cirugías, hospitalizaciones, medicación actual o pasada (especialmente psicofármacos), consumo de sustancias psicoactivas (tipo, frecuencia, tiempo de consumo), alergias, condiciones crónicas que puedan afectar el funcionamiento psicológico.</p>
+    </div>
+    <div class="nivel-box nb-morado">
+      <h4 style="color:var(--morado);margin-bottom:8px">7. Historia Laboral y Social</h4>
+      <p class="tp">Trayectoria laboral, estabilidad económica, red de apoyo social (amigos, comunidad, grupos), calidad de las relaciones interpersonales, actividades de ocio y tiempo libre, condiciones de vivienda. Estos datos permiten evaluar el nivel de funcionamiento social del paciente.</p>
+    </div>
+    <div class="nivel-box nb-verde">
+      <h4 style="color:var(--verde);margin-bottom:8px">8. Historia Psicológica o Psiquiátrica Previa</h4>
+      <p class="tp">Consultas psicológicas o psiquiátricas anteriores, diagnósticos previos recibidos, tipos de tratamiento (psicoterapia, farmacológico, hospitalización), adherencia al tratamiento y resultado percibido por el paciente. Esta área es clave para comprender la trayectoria clínica.</p>
+    </div>
+    <hr class="sep">
+    <h3 style="font-size:16px;font-weight:700;color:var(--azul);margin-bottom:14px;padding-bottom:6px;border-bottom:2px solid var(--azul3)">🎯 Funciones clínicas de la anamnesis</h3>
+    <ul style="padding-left:20px;margin-bottom:14px">
+      <li class="tp"><strong>Establece el vínculo terapéutico inicial:</strong> la forma en que el paciente narra su historia dice tanto como el contenido mismo.</li>
+      <li class="tp"><strong>Contextualiza los síntomas:</strong> un mismo síntoma tiene significado clínico distinto según la historia de quien lo porta.</li>
+      <li class="tp"><strong>Orienta la selección de instrumentos</strong> de evaluación psicológica posteriores.</li>
+      <li class="tp"><strong>Identifica factores de riesgo y protectores</strong> en el cuadro clínico.</li>
+      <li class="tp"><strong>Genera las primeras hipótesis clínicas</strong> que luego se contrastarán con pruebas estandarizadas.</li>
+    </ul>
+    <hr class="sep">
+    <h3 style="font-size:16px;font-weight:700;color:var(--azul);margin-bottom:14px;padding-bottom:6px;border-bottom:2px solid var(--azul3)">🔗 Relación con la observación clínica</h3>
+    <p class="tp">Durante la anamnesis, el clínico aplica simultáneamente la observación de primer y segundo nivel: mientras recoge el relato verbal del paciente (contenido), observa <em>cómo lo cuenta</em> — conducta, afecto, postura, habla, pausas, reacciones emocionales. Por ello la anamnesis y la observación clínica no son momentos separados, sino procesos que ocurren en paralelo durante la entrevista.</p>
+    <hr class="sep">
+    <h3 style="font-size:16px;font-weight:700;color:var(--azul);margin-bottom:14px;padding-bottom:6px;border-bottom:2px solid var(--azul3)">⚠️ Errores frecuentes en la anamnesis</h3>
+    <ul style="padding-left:20px">
+      <li class="tp"><strong>Registrar interpretaciones como datos:</strong> escribir "el paciente está deprimido" en lugar de describir los síntomas que llevaron a esa hipótesis.</li>
+      <li class="tp"><strong>Omitir áreas completas</strong> por considerar que no son relevantes antes de explorarlas.</li>
+      <li class="tp"><strong>No registrar el motivo de consulta en las palabras del paciente,</strong> sino en las del evaluador.</li>
+      <li class="tp"><strong>Confundir historia familiar con historia personal,</strong> mezclando datos de los padres con los del paciente.</li>
+      <li class="tp"><strong>No indagar antecedentes psicológicos previos,</strong> lo que impide comprender la trayectoria clínica.</li>
+    </ul>
+  </div>
+  <div style="text-align:center;margin-top:4px">
+    <button class="btn btn-success" onclick="ir('sesiones')" style="font-size:15px;padding:14px 32px">✍️ Ir a Mis Anamnesis →</button>
+  </div>
+</div>
+</div>
+
+<!-- SESIONES -->
+<div id="screen-sesiones" class="screen">
+<header>
+  <div><div class="header-title">✍️ Mis Anamnesis</div><div class="header-sub">Psicodiagnóstico Práctica | Docente: Bryan Palma</div></div>
+  <button class="btn btn-outline btn-sm" onclick="ir('inicio')">← Inicio</button>
+</header>
+<div style="max-width:820px;margin:0 auto;padding:28px 20px">
+  <div class="card" style="border-left:5px solid var(--azul2)">
+    <p style="font-size:14px;color:#334155;line-height:1.7">Completa <strong>3 anamnesis</strong> con pacientes reales. Cada formulario recorre todas las áreas clínicas. Al finalizar cada una, sube el <strong>link de tus evidencias</strong> (fotos del paciente, consentimiento informado, documentos de apoyo).</p>
+  </div>
+  <div class="sesion-grid" id="sesiones-grid"></div>
+</div>
+</div>
+
+<!-- FORMULARIO -->
+<div id="screen-formulario" class="screen">
+<header>
+  <div><div class="header-title" id="form-header-title">Anamnesis</div><div class="header-sub">Psicodiagnóstico Práctica | Docente: Bryan Palma</div></div>
+  <button class="btn btn-outline btn-sm" onclick="ir('sesiones')">← Mis Anamnesis</button>
+</header>
+<div style="max-width:820px;margin:0 auto;padding:28px 20px" id="form-contenido"></div>
+</div>
+
+<!-- QUIZ -->
+<div id="screen-quiz" class="screen">
+<header>
+  <div><div class="header-title">🎯 Quiz de Refuerzo — Anamnesis</div><div class="header-sub">Psicodiagnóstico Práctica | Docente: Bryan Palma</div></div>
+  <button class="btn btn-outline btn-sm" onclick="ir('inicio')">← Inicio</button>
+</header>
+<div style="max-width:720px;margin:0 auto;padding:28px 20px" id="quiz-contenido"></div>
+</div>
+
+<!-- EL DATO PERDIDO -->
+<div id="screen-datoperdido" class="screen">
+<header>
+  <div><div class="header-title">🔎 El Dato Perdido</div><div class="header-sub">Psicodiagnóstico Práctica | Docente: Bryan Palma</div></div>
+  <button class="btn btn-outline btn-sm" onclick="ir('inicio')">← Inicio</button>
+</header>
+<div style="max-width:820px;margin:0 auto;padding:28px 20px" id="dato-contenido"></div>
+</div>
+
+<!-- MODAL ADMIN -->
+<div id="modal-admin" class="modal-overlay" style="display:none">
+<div class="modal">
+  <h2 style="font-size:18px;font-weight:700;color:var(--azul);margin-bottom:16px">🔒 Panel Docente</h2>
+  <div id="admin-login">
+    <p style="font-size:14px;color:#64748b;margin-bottom:12px">Contraseña docente:</p>
+    <input type="password" id="admin-pass" placeholder="Contraseña" style="margin-bottom:12px" onkeydown="if(event.key==='Enter')verificarAdmin()">
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" onclick="verificarAdmin()">Ingresar</button>
+      <button class="btn btn-outline" onclick="cerrarAdmin()">Cancelar</button>
+    </div>
+    <div id="admin-error" style="display:none;color:var(--rojo);font-size:13px;margin-top:8px">❌ Contraseña incorrecta</div>
+  </div>
+  <div id="admin-panel" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <span class="badge badge-verde">✅ Acceso concedido</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="exportarCSV()">⬇ CSV</button>
+        <button class="btn btn-outline btn-sm" onclick="cerrarAdmin()">Cerrar</button>
+      </div>
+    </div>
+    <select id="admin-filtro" onchange="renderTablaAdmin()" style="margin-bottom:12px">
+      <option value="">Todos los registros</option>
+      <option value="anamnesis">Solo anamnesis</option>
+      <option value="quiz">Quiz de refuerzo</option>
+      <option value="datoperdido">El Dato Perdido</option>
+    </select>
+    <div id="admin-tabla" style="overflow-x:auto;max-height:420px;overflow-y:auto"></div>
+  </div>
+</div>
+</div>
+
+<script>
+const CFG = { PASSWORD:"palma2025", SCRIPT_URL:"https://script.google.com/macros/s/AKfycbx92JD6xmE4jJvI-OtM-zMAF7p0laVYg6kIQNxYE6vcp8D6bCH3lntzjx7R4q85bF2C/exec" };
+
+const QUIZ = [
+  {p:"¿Cuál es el área donde se registra textualmente lo que dice el paciente al llegar?",ops:["Historia del problema actual","Datos de identificación","Motivo de consulta","Historia psicológica previa"],c:2,e:"El motivo de consulta se registra en las palabras exactas del paciente, sin interpretación clínica."},
+  {p:"Un paciente menciona que su madre también tuvo episodios de tristeza prolongada. ¿A qué área pertenece?",ops:["Historia médica","Historia familiar","Historia personal y del desarrollo","Historia laboral"],c:1,e:"Los antecedentes psicopatológicos de familiares directos pertenecen a la historia familiar."},
+  {p:"¿Cuál es una función clínica de la anamnesis?",ops:["Diagnosticar al paciente de manera definitiva","Seleccionar el tratamiento farmacológico","Generar las primeras hipótesis clínicas","Reemplazar las pruebas estandarizadas"],c:2,e:"La anamnesis genera hipótesis clínicas iniciales que luego se contrastan con instrumentos de evaluación."},
+  {p:"El evaluador escribe: 'el paciente está deprimido'. ¿Qué error comete?",ops:["Registra un dato de observación de primer nivel","Usa lenguaje coloquial innecesario","Registra una inferencia como si fuera un dato observable","Omite el motivo de consulta"],c:2,e:"Escribir 'está deprimido' sin describir los síntomas mezcla la interpretación clínica con el dato empírico."},
+  {p:"¿Qué área incluye los hitos del desarrollo psicomotor y la historia escolar?",ops:["Historia médica","Historia familiar","Historia psicológica previa","Historia personal y del desarrollo"],c:3,e:"El desarrollo psicomotor, el lenguaje y la trayectoria escolar pertenecen a la historia personal y del desarrollo."},
+  {p:"La anamnesis y la observación clínica son:",ops:["Procesos separados en momentos distintos","Procesos que ocurren en paralelo durante la entrevista","La misma técnica con distinto nombre","Instrumentos exclusivos de la psiquiatría"],c:1,e:"Durante la anamnesis el clínico recoge el relato verbal y simultáneamente observa cómo el paciente lo narra."},
+  {p:"¿Cuál de estos datos pertenece al área de historia médica?",ops:["Diagnósticos psicológicos previos","Relaciones con hermanos","Consumo de sustancias psicoactivas","Desempeño laboral actual"],c:2,e:"El consumo de sustancias (tipo, frecuencia, tiempo) se registra en la historia médica."},
+  {p:"Un estudiante omite preguntar sobre antecedentes psicológicos previos porque cree que es 'la primera vez'. ¿Qué error comete?",ops:["Ninguno, es una decisión válida","Omite un área completa antes de explorarla","Mezcla historia personal con historia familiar","Registra el motivo de consulta incorrectamente"],c:1,e:"Omitir áreas de la anamnesis sin explorarlas es un error frecuente. Siempre se deben indagar todas las áreas."},
+  {p:"¿Qué elemento del motivo de consulta es indispensable registrar?",ops:["La interpretación clínica del evaluador","Las palabras textuales del paciente","El diagnóstico presuntivo","El historial de tratamientos"],c:1,e:"El motivo de consulta debe registrarse con las palabras exactas del paciente para no contaminar el dato."},
+  {p:"¿A qué área corresponde información sobre la red de apoyo social del paciente?",ops:["Historia personal y del desarrollo","Historia familiar","Historia laboral y social","Historia médica"],c:2,e:"La red de apoyo social, calidad de relaciones y condiciones de vida pertenecen a la historia laboral y social."},
+  {p:"La historia psicológica previa incluye:",ops:["Solo los diagnósticos recibidos","Tratamientos, adherencia y resultado percibido por el paciente","Únicamente la medicación actual","Los antecedentes familiares de enfermedades mentales"],c:1,e:"Esta área recoge consultas previas, diagnósticos, tipos de tratamiento, adherencia y cómo vivió el paciente esa experiencia."},
+  {p:"¿Por qué es importante conocer las condiciones del embarazo y parto?",ops:["Para completar el formulario administrativo","Pueden revelar factores de riesgo neurológicos o del desarrollo","Solo tiene importancia en pediatría","No es un dato relevante para el psicodiagnóstico"],c:1,e:"Las condiciones perinatales pueden revelar factores de riesgo que explican dificultades del desarrollo posteriores."}
+];
+
+const DATOS_PERDIDOS = [
+  {titulo:"Anamnesis de Julio, 32 años",
+   texto:`<strong>Datos de identificación:</strong> Julio, 32 años, soltero, ingeniero.<br><strong>Motivo de consulta:</strong> "Me siento muy estresado en el trabajo y tengo problemas para dormir."<br><strong>Historia del problema actual:</strong> El problema comenzó hace 6 meses tras un ascenso. Refiere dificultad para conciliar el sueño y pensamientos recurrentes sobre el trabajo.<br><strong>Historia médica:</strong> Sin enfermedades crónicas. Consume café en exceso. No consume alcohol ni sustancias.<br><strong>Historia laboral y social:</strong> Trabaja 10-12 horas diarias. Tiene pocos amigos y escasa vida social.`,
+   preg:"¿Qué áreas importantes están ausentes en esta anamnesis?",
+   ops:["Faltan historia familiar, historia personal y del desarrollo, e historia psicológica previa","Solo falta el diagnóstico final","Falta únicamente la historia médica completa","La anamnesis está completa"],
+   c:0,
+   exp:"Faltan la historia familiar (antecedentes psicopatológicos en familia), la historia personal y del desarrollo (infancia, hitos, escolaridad) y la historia psicológica previa (¿ha consultado antes?). Son áreas fundamentales para comprender el cuadro."},
+  {titulo:"Anamnesis de Carmen, 45 años",
+   texto:`<strong>Datos de identificación:</strong> Carmen, 45 años, casada, 2 hijos, docente.<br><strong>Motivo de consulta (según el evaluador):</strong> "La paciente presenta sintomatología ansiosa con componente somático."<br><strong>Historia del problema actual:</strong> Lleva un año con episodios de taquicardia, sudoración y sensación de ahogo. Evaluación cardiológica sin hallazgos.<br><strong>Historia familiar:</strong> Su madre fue tratada por "nervios" durante años. Relación tensa con su esposo desde hace 2 años.<br><strong>Historia psicológica previa:</strong> Nunca ha consultado antes.`,
+   preg:"¿Qué error específico se cometió en el motivo de consulta?",
+   ops:["El motivo de consulta es demasiado corto","Se registró la interpretación clínica del evaluador en lugar de las palabras de la paciente","Se olvidó la fecha de consulta","No hay ningún error"],
+   c:1,
+   exp:"El motivo de consulta debe registrarse con las palabras exactas de la paciente, no con la interpretación técnica del evaluador. 'Presenta sintomatología ansiosa con componente somático' es una hipótesis clínica, no el motivo de consulta."},
+  {titulo:"Anamnesis de Roberto, 17 años",
+   texto:`<strong>Datos de identificación:</strong> Roberto, 17 años, estudiante de bachillerato.<br><strong>Motivo de consulta:</strong> "No quiero ir al colegio, me da miedo."<br><strong>Historia del problema actual:</strong> El rechazo escolar comenzó hace 3 meses. Refiere que "algunos compañeros se burlan de él".<br><strong>Historia personal y del desarrollo:</strong> Nació a término. Desarrollo psicomotor normal. Repitió 2do de básica por dificultades de atención. Siempre fue descrito como "tímido".<br><strong>Historia familiar:</strong> Vive con su madre y abuela. El padre abandonó el hogar cuando Roberto tenía 4 años.`,
+   preg:"¿Qué dato crítico falta explorar y por qué es relevante?",
+   ops:["Falta la historia médica y psicológica previa; el antecedente de dificultades de atención requiere saber si tuvo evaluaciones o tratamientos previos","Falta solo saber si Roberto tiene hermanos","Falta la historia laboral","No falta ningún dato relevante"],
+   c:0,
+   exp:"El antecedente de haber repetido un año por 'dificultades de atención' es clínicamente significativo. Sin la historia médica y psicológica previa (¿fue evaluado? ¿tiene diagnóstico de TDAH?) no es posible saber si el cuadro actual es una continuación de un problema previo no atendido."},
+  {titulo:"Anamnesis de Patricia, 38 años",
+   texto:`<strong>Motivo de consulta:</strong> "Me siento vacía, no tengo ganas de nada."<br><strong>Historia del problema actual:</strong> Lleva más de un año sintiéndose así. Duerme en exceso, ha subido de peso y dejó de ver a sus amigos. Niega ideación suicida activa pero refiere que "a veces piensa que sería mejor no estar".<br><strong>Historia psicológica previa:</strong> Estuvo en tratamiento psiquiátrico hace 5 años. Tomó antidepresivos 8 meses, los dejó porque "se sentía bien".<br><strong>Historia médica:</strong> Hipotiroidismo diagnosticado hace 2 años, actualmente sin tratamiento.`,
+   preg:"¿Qué dato del caso requiere atención clínica prioritaria?",
+   ops:["Que dejó los antidepresivos","La referencia a 'sería mejor no estar', que debe explorarse de inmediato como posible ideación suicida pasiva","Que tiene hipotiroidismo","Que duerme en exceso"],
+   c:1,
+   exp:"La expresión 'sería mejor no estar' constituye una señal de ideación suicida pasiva que debe explorarse con preguntas específicas de riesgo antes de continuar. Además, el hipotiroidismo sin tratamiento puede ser un factor contribuyente al cuadro depresivo."}
+];
+
+let app = {
+  nombre: localStorage.getItem("ana_nombre") || "",
+  registros: JSON.parse(localStorage.getItem("ana_registros") || "[]"),
+  qi: 0, qp: 0, qr: {},
+  di: 0, dr: {}
+};
+
+function guardarNombre() {
+  const n = document.getElementById("nombre-estudiante").value.trim();
+  if (!n) { alert("Ingresa tu nombre completo."); return; }
+  app.nombre = n;
+  localStorage.setItem("ana_nombre", n);
+  document.getElementById("nombre-ok").style.display = "block";
+}
+
+function ir(p) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("screen-" + p).classList.add("active");
+  window.scrollTo(0, 0);
+  if (p === "sesiones") renderSesiones();
+  if (p === "quiz") iniciarQuiz();
+  if (p === "datoperdido") iniciarDato();
+}
+
+function renderSesiones() {
+  let h = "";
+  [1,2,3].forEach(n => {
+    const ok = app.registros.find(r => r.tipo === "anamnesis" && r.sesion === n);
+    h += `<div class="sesion-card ${ok?'done':''}" onclick="abrirForm(${n})">
+      <div style="font-size:36px;margin-bottom:10px">${ok?"✅":"📋"}</div>
+      <div style="font-weight:700;font-size:16px;color:var(--azul)">Anamnesis ${n}</div>
+      <div style="font-size:13px;color:#64748b;margin-top:6px">${ok?"Completada — "+ok.fecha:"Pendiente"}</div>
+      <div style="margin-top:10px"><span class="badge ${ok?'badge-verde':'badge-azul'}">${ok?"✔ Enviada":"→ Completar"}</span></div>
+    </div>`;
+  });
+  document.getElementById("sesiones-grid").innerHTML = h;
+}
+
+function abrirForm(n) {
+  if (!app.nombre) { alert("Primero ingresa tu nombre en la pantalla de inicio."); ir("inicio"); return; }
+  document.getElementById("form-header-title").textContent = `Anamnesis ${n} — ${app.nombre}`;
+  document.getElementById("form-contenido").innerHTML = buildForm(n);
+  ir("formulario");
+}
+
+function buildForm(n) {
+  const g = (cols) => `<div style="display:grid;grid-template-columns:${cols};gap:12px">`;
+  return `
+  <div class="card" style="border-left:5px solid var(--azul2)">
+    <p style="font-size:14px;color:#334155;line-height:1.7">Completa todos los campos con la información del paciente. Al finalizar sube el link de tus evidencias. Los campos con <span class="req">*</span> son obligatorios.</p>
+  </div>
+  <div class="card">
+    <div class="area-header">👤 1. Datos de Identificación</div>
+    <label class="field-label">Nombre del paciente (o iniciales)<span class="req">*</span></label>
+    <input type="text" id="f-np" placeholder="Nombre o iniciales por privacidad">
+    ${g("1fr 1fr")}<div><label class="field-label">Edad<span class="req">*</span></label><input type="number" id="f-edad" placeholder="Años" min="1" max="110"></div>
+    <div><label class="field-label">Sexo<span class="req">*</span></label><select id="f-sexo"><option value="">Seleccionar</option><option>Masculino</option><option>Femenino</option><option>Otro</option></select></div></div>
+    ${g("1fr 1fr")}<div><label class="field-label">Estado civil</label><select id="f-civil"><option value="">—</option><option>Soltero/a</option><option>Casado/a</option><option>Divorciado/a</option><option>Viudo/a</option><option>Unión libre</option></select></div>
+    <div><label class="field-label">Nivel educativo</label><select id="f-edu"><option value="">—</option><option>Primaria</option><option>Secundaria</option><option>Bachillerato</option><option>Universitario</option><option>Posgrado</option><option>Sin escolaridad</option></select></div></div>
+    <label class="field-label">Ocupación</label><input type="text" id="f-ocup" placeholder="Profesión u ocupación actual">
+    <label class="field-label">Lugar de residencia</label><input type="text" id="f-resid" placeholder="Ciudad / barrio">
+  </div>
+  <div class="card">
+    <div class="area-header" style="background:var(--naranja)">💬 2. Motivo de Consulta</div>
+    <p style="font-size:13px;color:#64748b;margin-bottom:10px">Registra textualmente lo que el paciente dice. No interpretes aún.</p>
+    <label class="field-label">¿Por qué viene hoy? (en palabras del paciente)<span class="req">*</span></label>
+    <textarea id="f-motivo" placeholder='"Me siento... / Vengo porque... / Me dijeron que..."'></textarea>
+  </div>
+  <div class="card">
+    <div class="area-header" style="background:var(--morado)">🕐 3. Historia del Problema Actual</div>
+    <label class="field-label">¿Cuándo comenzó el problema?<span class="req">*</span></label>
+    <input type="text" id="f-inicio" placeholder="Ej: hace 3 meses, en enero de 2024...">
+    <label class="field-label">¿Cómo se desarrolló? (cronológico)<span class="req">*</span></label>
+    <textarea id="f-desa" placeholder="Describe la evolución desde el inicio hasta hoy..."></textarea>
+    <label class="field-label">¿Qué factores precipitaron el problema?</label>
+    <textarea id="f-prec" placeholder="Eventos o cambios asociados al inicio..."></textarea>
+    <label class="field-label">¿Qué lo agrava? ¿Qué lo alivia?</label>
+    <textarea id="f-agra" placeholder="Factores que empeoran o mejoran el problema..."></textarea>
+    <label class="field-label">¿Intentos previos de solución?</label>
+    <textarea id="f-inte" placeholder="¿Qué ha intentado el paciente o su familia?"></textarea>
+  </div>
+  <div class="card">
+    <div class="area-header" style="background:var(--verde)">🌱 4. Historia Personal y del Desarrollo</div>
+    <label class="field-label">Embarazo y parto</label>
+    <textarea id="f-emba" placeholder="Condiciones del embarazo, tipo de parto, complicaciones..."></textarea>
+    <label class="field-label">Hitos del desarrollo psicomotor y lenguaje</label>
+    <textarea id="f-hito" placeholder="Gateo, marcha, primeras palabras, control de esfínteres..."></textarea>
+    <label class="field-label">Historia escolar</label>
+    <textarea id="f-esco" placeholder="Rendimiento, relaciones, cambios de colegio, dificultades..."></textarea>
+    <label class="field-label">Eventos significativos en infancia/adolescencia</label>
+    <textarea id="f-even" placeholder="Traumas, pérdidas, separaciones, experiencias relevantes..."></textarea>
+  </div>
+  <div class="card">
+    <div class="area-header">👨‍👩‍👧 5. Historia Familiar</div>
+    <label class="field-label">Composición familiar</label>
+    <textarea id="f-fami" placeholder="¿Con quién vive? ¿Cómo está conformada su familia?"></textarea>
+    <label class="field-label">Dinámica y vínculos familiares</label>
+    <textarea id="f-vinc" placeholder="Tipo de relaciones, comunicación, roles, conflictos..."></textarea>
+    <label class="field-label">Antecedentes psicopatológicos familiares</label>
+    <textarea id="f-ante" placeholder="¿Algún familiar con diagnóstico psicológico o psiquiátrico?"></textarea>
+  </div>
+  <div class="card">
+    <div class="area-header" style="background:var(--naranja)">🏥 6. Historia Médica</div>
+    <label class="field-label">Enfermedades previas o actuales</label>
+    <textarea id="f-enfe" placeholder="Enfermedades crónicas, cirugías, hospitalizaciones..."></textarea>
+    <label class="field-label">Medicación actual</label>
+    <input type="text" id="f-medi" placeholder="Fármacos actuales (incluir dosis si conoce)">
+    <label class="field-label">Consumo de sustancias psicoactivas</label>
+    <textarea id="f-sust" placeholder="Tipo, frecuencia, tiempo de consumo..."></textarea>
+  </div>
+  <div class="card">
+    <div class="area-header" style="background:var(--morado)">💼 7. Historia Laboral y Social</div>
+    <label class="field-label">Situación laboral actual</label>
+    <textarea id="f-labo" placeholder="Trabajo, estabilidad, condiciones, satisfacción..."></textarea>
+    <label class="field-label">Red de apoyo social</label>
+    <textarea id="f-soci" placeholder="Amigos, grupos, comunidad, personas de confianza..."></textarea>
+  </div>
+  <div class="card">
+    <div class="area-header" style="background:var(--rojo)">🧩 8. Historia Psicológica / Psiquiátrica Previa</div>
+    <label class="field-label">¿Ha consultado antes con psicólogo o psiquiatra?</label>
+    <select id="f-cons"><option value="">Seleccionar</option><option>Sí</option><option>No</option></select>
+    <label class="field-label">Diagnósticos previos (si aplica)</label>
+    <input type="text" id="f-diag" placeholder="Diagnósticos recibidos anteriormente...">
+    <label class="field-label">Tratamientos recibidos y resultado</label>
+    <textarea id="f-trat" placeholder="¿Qué tratamiento tuvo? ¿Cómo lo vivió? ¿Le ayudó?"></textarea>
+  </div>
+  <div class="card" style="border:2px solid var(--verde)">
+    <div class="area-header" style="background:var(--verde)">📎 Evidencias del Caso</div>
+    <p style="font-size:13px;color:#334155;margin-bottom:12px;line-height:1.7">Sube tus evidencias a Google Drive, OneDrive o Dropbox y pega el link aquí. Pueden incluir: <strong>fotografías del paciente</strong> (con autorización), consentimiento informado, notas de sesión.</p>
+    <label class="field-label">Link de evidencias<span class="req">*</span></label>
+    <input type="url" id="f-link" placeholder="https://drive.google.com/...">
+    <label class="field-label">¿Qué incluye el link?</label>
+    <textarea id="f-ldesc" placeholder="Ej: fotos de la sesión, consentimiento firmado..." style="min-height:70px"></textarea>
+  </div>
+  <div class="card">
+    <div class="area-header">📝 Observaciones del Evaluador</div>
+    <textarea id="f-obs" placeholder="Notas clínicas, observaciones de primer y segundo nivel, hipótesis preliminares..." style="min-height:110px"></textarea>
+  </div>
+  <div id="form-feedback"></div>
+  <div style="text-align:right;margin-bottom:32px">
+    <button class="btn btn-success" style="font-size:15px;padding:14px 32px" onclick="enviarForm(${n})">✅ Enviar Anamnesis ${n}</button>
+  </div>`;
+}
+
+function g(id) { const e = document.getElementById(id); return e ? e.value.trim() : ""; }
+
+function enviarForm(n) {
+  const req = [{id:"f-np",l:"Nombre del paciente"},{id:"f-edad",l:"Edad"},{id:"f-sexo",l:"Sexo"},{id:"f-motivo",l:"Motivo de consulta"},{id:"f-inicio",l:"Inicio del problema"},{id:"f-desa",l:"Desarrollo del problema"},{id:"f-link",l:"Link de evidencias"}];
+  for (const r of req) {
+    const el = document.getElementById(r.id);
+    if (!el || !el.value.trim()) {
+      el.style.borderColor = "#dc2626";
+      el.scrollIntoView({behavior:"smooth",block:"center"});
+      alert(`Campo obligatorio: "${r.l}"`);
+      return;
+    }
+    el.style.borderColor = "";
+  }
+  const d = {tipo:"anamnesis",sesion:n,fecha:new Date().toLocaleString("es-EC"),nombre:app.nombre,
+    nombre_paciente:g("f-np"),edad:g("f-edad"),sexo:g("f-sexo"),estado_civil:g("f-civil"),educacion:g("f-edu"),
+    ocupacion:g("f-ocup"),residencia:g("f-resid"),motivo:g("f-motivo"),inicio:g("f-inicio"),desarrollo:g("f-desa"),
+    precipitantes:g("f-prec"),agrava_alivia:g("f-agra"),intentos:g("f-inte"),embarazo:g("f-emba"),
+    hitos:g("f-hito"),escolar:g("f-esco"),eventos:g("f-even"),familia:g("f-fami"),vinculos:g("f-vinc"),
+    antecedentes:g("f-ante"),enfermedades:g("f-enfe"),medicacion:g("f-medi"),sustancias:g("f-sust"),
+    laboral:g("f-labo"),social:g("f-soci"),consulta_previa:g("f-cons"),diagnosticos:g("f-diag"),
+    tratamientos:g("f-trat"),link_evidencias:g("f-link"),desc_evidencias:g("f-ldesc"),observaciones:g("f-obs")};
+  app.registros.push(d);
+  localStorage.setItem("ana_registros", JSON.stringify(app.registros));
+  enviarSheets(d);
+  document.getElementById("form-feedback").innerHTML = `<div class="feedback-box fb-ok"><strong>✅ Anamnesis ${n} enviada correctamente</strong><br>Tus datos han sido registrados y enviados al docente.</div>`;
+  window.scrollTo(0,0);
+  setTimeout(() => ir("sesiones"), 2200);
+}
+
+function iniciarQuiz() { app.qi=0; app.qp=0; app.qr={}; renderQ(); }
+function renderQ() {
+  if (app.qi >= QUIZ.length) { finQuiz(); return; }
+  const q = QUIZ[app.qi];
+  const pct = Math.round((app.qi/QUIZ.length)*100);
+  let ops = q.ops.map((o,i) => `<button class="qopt" id="qo${i}" onclick="respQ(${i})">${o}</button>`).join("");
+  document.getElementById("quiz-contenido").innerHTML = `<div class="card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="badge badge-naranja">Pregunta ${app.qi+1}/${QUIZ.length}</span><span style="font-size:13px;color:#64748b">Puntaje: ${app.qp}</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <p style="font-size:15px;font-weight:600;color:var(--azul);margin-bottom:18px;line-height:1.6">${q.p}</p>
+    ${ops}<div id="qfb"></div></div>`;
+}
+function respQ(i) {
+  if (app.qr[app.qi] !== undefined) return;
+  app.qr[app.qi] = i;
+  const q = QUIZ[app.qi]; const ok = i===q.c;
+  if(ok) app.qp++;
+  for(let j=0;j<q.ops.length;j++){
+    const el=document.getElementById("qo"+j);
+    if(j===q.c) el.classList.add("mostrar");
+    else if(j===i&&!ok) el.classList.add("incorrecto");
+    el.disabled=true;
+  }
+  document.getElementById("qfb").innerHTML=`<div class="feedback-box ${ok?'fb-ok':'fb-mal'}"><strong>${ok?"✅ ¡Correcto!":"❌ Incorrecto"}</strong><br>${q.e}</div>
+  <div style="text-align:right;margin-top:12px"><button class="btn btn-naranja" onclick="app.qi++;renderQ()">${app.qi+1<QUIZ.length?"Siguiente →":"Ver resultado"}</button></div>`;
+}
+function finQuiz() {
+  const pct=Math.round((app.qp/QUIZ.length)*100);
+  const d={tipo:"quiz",fecha:new Date().toLocaleString("es-EC"),nombre:app.nombre,puntaje:`${app.qp}/${QUIZ.length}`,porcentaje:`${pct}%`};
+  app.registros.push(d); localStorage.setItem("ana_registros",JSON.stringify(app.registros)); enviarSheets(d);
+  document.getElementById("quiz-contenido").innerHTML=`<div class="card" style="text-align:center;padding:32px">
+    <div style="font-size:48px;margin-bottom:16px">${pct>=90?"⭐⭐⭐":pct>=70?"⭐⭐":"⭐"}</div>
+    <h2 style="font-size:22px;font-weight:800;color:var(--azul);margin-bottom:8px">Quiz completado</h2>
+    <p style="font-size:32px;font-weight:700;color:var(--naranja);margin-bottom:8px">${app.qp}/${QUIZ.length}</p>
+    <p style="font-size:16px;color:#64748b;margin-bottom:20px">${pct}% — ${pct>=90?"¡Excelente dominio!":pct>=70?"Buen trabajo, sigue repasando.":"Revisa el marco teórico e intenta de nuevo."}</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-naranja" onclick="iniciarQuiz()">🔄 Repetir quiz</button>
+      <button class="btn btn-outline" onclick="ir('inicio')">← Inicio</button>
+    </div></div>`;
+}
+
+function iniciarDato() { app.di=0; app.dr={}; renderD(); }
+function renderD() {
+  if (app.di >= DATOS_PERDIDOS.length) { finDato(); return; }
+  const c = DATOS_PERDIDOS[app.di];
+  const pct=Math.round((app.di/DATOS_PERDIDOS.length)*100);
+  let ops=c.ops.map((o,i)=>`<button class="qopt" id="do${i}" onclick="respD(${i})">${o}</button>`).join("");
+  document.getElementById("dato-contenido").innerHTML=`<div class="card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="badge badge-morado">Caso ${app.di+1}/${DATOS_PERDIDOS.length}</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="background:var(--morado);width:${pct}%"></div></div>
+    <h3 style="font-size:15px;font-weight:700;color:var(--morado);margin-bottom:12px">${c.titulo}</h3>
+    <div style="background:#f8fafc;border:1.5px solid var(--borde);border-radius:10px;padding:16px;font-size:14px;line-height:1.85;margin-bottom:16px">${c.texto}</div>
+    <p style="font-size:14px;font-weight:600;color:var(--morado);margin-bottom:14px">${c.preg}</p>
+    ${ops}<div id="dfb"></div></div>`;
+}
+function respD(i) {
+  if (app.dr[app.di]!==undefined) return;
+  app.dr[app.di]=i;
+  const c=DATOS_PERDIDOS[app.di]; const ok=i===c.c;
+  for(let j=0;j<c.ops.length;j++){
+    const el=document.getElementById("do"+j);
+    if(j===c.c) el.classList.add("mostrar");
+    else if(j===i&&!ok) el.classList.add("incorrecto");
+    el.disabled=true;
+  }
+  document.getElementById("dfb").innerHTML=`<div class="feedback-box ${ok?'fb-ok':'fb-mal'}"><strong>${ok?"✅ Análisis correcto":"❌ No del todo"}</strong><br>${c.exp}</div>
+  <div style="text-align:right;margin-top:12px"><button class="btn btn-morado" onclick="app.di++;renderD()">${app.di+1<DATOS_PERDIDOS.length?"Siguiente caso →":"Ver resultado"}</button></div>`;
+}
+function finDato() {
+  const correctas=Object.entries(app.dr).filter(([i,v])=>v===DATOS_PERDIDOS[+i]?.c).length;
+  const pct=Math.round((correctas/DATOS_PERDIDOS.length)*100);
+  const d={tipo:"datoperdido",fecha:new Date().toLocaleString("es-EC"),nombre:app.nombre,puntaje:`${correctas}/${DATOS_PERDIDOS.length}`,porcentaje:`${pct}%`};
+  app.registros.push(d); localStorage.setItem("ana_registros",JSON.stringify(app.registros)); enviarSheets(d);
+  document.getElementById("dato-contenido").innerHTML=`<div class="card" style="text-align:center;padding:32px">
+    <div style="font-size:48px;margin-bottom:16px">🔎</div>
+    <h2 style="font-size:22px;font-weight:800;color:var(--morado);margin-bottom:8px">El Dato Perdido — Completado</h2>
+    <p style="font-size:32px;font-weight:700;color:var(--morado);margin-bottom:8px">${correctas}/${DATOS_PERDIDOS.length}</p>
+    <p style="font-size:16px;color:#64748b;margin-bottom:20px">${pct>=75?"Excelente pensamiento clínico crítico.":"Sigue practicando el análisis de anamnesis."}</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-morado" onclick="iniciarDato()">🔄 Repetir</button>
+      <button class="btn btn-outline" onclick="ir('inicio')">← Inicio</button>
+    </div></div>`;
+}
+
+function abrirAdmin() {
+  document.getElementById("modal-admin").style.display="flex";
+  document.getElementById("admin-login").style.display="block";
+  document.getElementById("admin-panel").style.display="none";
+  document.getElementById("admin-error").style.display="none";
+  document.getElementById("admin-pass").value="";
+}
+function cerrarAdmin() { document.getElementById("modal-admin").style.display="none"; }
+function verificarAdmin() {
+  if (document.getElementById("admin-pass").value===CFG.PASSWORD) {
+    document.getElementById("admin-login").style.display="none";
+    document.getElementById("admin-panel").style.display="block";
+    renderTablaAdmin();
+  } else { document.getElementById("admin-error").style.display="block"; }
+}
+function renderTablaAdmin() {
+  const f=document.getElementById("admin-filtro").value;
+  let datos=app.registros;
+  if(f) datos=datos.filter(r=>r.tipo===f);
+  if(!datos.length){document.getElementById("admin-tabla").innerHTML=`<p style="font-size:14px;color:#64748b;text-align:center;padding:20px">No hay registros aún.</p>`;return;}
+  let h=`<table class="at"><thead><tr><th>Fecha</th><th>Estudiante</th><th>Tipo</th><th>Detalle</th><th>Link Evidencias</th></tr></thead><tbody>`;
+  datos.forEach(r=>{
+    let det="";
+    if(r.tipo==="anamnesis") det=`Sesión ${r.sesion} | Pte: ${r.nombre_paciente||"-"} | ${(r.motivo||"").substring(0,50)}...`;
+    else det=`Puntaje: ${r.puntaje} (${r.porcentaje})`;
+    const lnk=r.link_evidencias?`<a href="${r.link_evidencias}" target="_blank" style="color:var(--azul2);font-size:12px">Ver →</a>`:"-";
+    h+=`<tr><td style="white-space:nowrap;font-size:11px">${r.fecha}</td><td><strong>${r.nombre}</strong></td>
+    <td><span class="badge ${r.tipo==="anamnesis"?"badge-verde":r.tipo==="quiz"?"badge-naranja":"badge-morado"}">${r.tipo}</span></td>
+    <td style="font-size:12px">${det}</td><td>${lnk}</td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  document.getElementById("admin-tabla").innerHTML=h;
+}
+function exportarCSV() {
+  const datos=app.registros;
+  if(!datos.length){alert("No hay datos.");return;}
+  const cols=["fecha","nombre","tipo","sesion","nombre_paciente","motivo","link_evidencias","puntaje","porcentaje"];
+  let csv=cols.join(",")+"\n";
+  datos.forEach(r=>{csv+=cols.map(c=>`"${(r[c]||"").toString().replace(/"/g,"'")}""`).join(",")+"\n";});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download="anamnesis_psicodiagnostico.csv"; a.click();
+}
+async function enviarSheets(data) {
+  if(CFG.SCRIPT_URL==="PEGAR_URL_AQUI") return;
+  try { await fetch(CFG.SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)}); } catch(e){}
+}
+if(app.nombre){const el=document.getElementById("nombre-estudiante");if(el)el.value=app.nombre;}
+</script>
+</body>
+</html>
