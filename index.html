@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -238,24 +239,38 @@ hr.sep{border:none;border-top:2px solid var(--azul3);margin:20px 0}
   <div id="admin-panel" style="display:none">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
       <span class="badge badge-verde">✅ Acceso concedido</span>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="cargarDesdeSheets()">🔄 Actualizar</button>
         <button class="btn btn-primary btn-sm" onclick="exportarCSV()">⬇ CSV</button>
         <button class="btn btn-outline btn-sm" onclick="cerrarAdmin()">Cerrar</button>
       </div>
     </div>
-    <select id="admin-filtro" onchange="renderTablaAdmin()" style="margin-bottom:12px">
-      <option value="">Todos los registros</option>
-      <option value="anamnesis">Solo anamnesis</option>
-      <option value="quiz">Quiz de refuerzo</option>
-      <option value="datoperdido">El Dato Perdido</option>
-    </select>
+    <div id="admin-cargando" style="display:none;text-align:center;padding:12px;font-size:13px;color:var(--azul2)">⏳ Cargando datos desde Google Sheets...</div>
+    <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:130px">
+        <label style="font-size:12px;font-weight:600;color:var(--azul);display:block;margin-bottom:4px">Filtrar por tipo:</label>
+        <select id="admin-filtro" onchange="renderTablaAdmin()">
+          <option value="">Todos los registros</option>
+          <option value="anamnesis">Solo anamnesis</option>
+          <option value="quiz">Quiz de refuerzo</option>
+          <option value="datoperdido">El Dato Perdido</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:130px">
+        <label style="font-size:12px;font-weight:600;color:var(--azul);display:block;margin-bottom:4px">Filtrar por estudiante:</label>
+        <select id="admin-filtro-est" onchange="renderTablaAdmin()">
+          <option value="">Todos los estudiantes</option>
+        </select>
+      </div>
+    </div>
+    <div id="admin-resumen" style="margin-bottom:10px"></div>
     <div id="admin-tabla" style="overflow-x:auto;max-height:420px;overflow-y:auto"></div>
   </div>
 </div>
 </div>
 
 <script>
-const CFG = { PASSWORD:"palma2025", SCRIPT_URL:"https://script.google.com/macros/s/AKfycbx92JD6xmE4jJvI-OtM-zMAF7p0laVYg6kIQNxYE6vcp8D6bCH3lntzjx7R4q85bF2C/exec" };
+const CFG = { PASSWORD:"palma2025", SCRIPT_URL:"https://script.google.com/macros/s/AKfycbxoLe1rbTBnr8URAx9kybyyXjWhLCXFOHoggdPGzr_ra0_uKFCe5MbEWS5UG1ev8urg/exec" };
 
 const QUIZ = [
   {p:"¿Cuál es el área donde se registra textualmente lo que dice el paciente al llegar?",ops:["Historia del problema actual","Datos de identificación","Motivo de consulta","Historia psicológica previa"],c:2,e:"El motivo de consulta se registra en las palabras exactas del paciente, sin interpretación clínica."},
@@ -557,6 +572,8 @@ function finDato() {
     </div></div>`;
 }
 
+let datosSheets=[];
+
 function abrirAdmin() {
   document.getElementById("modal-admin").style.display="flex";
   document.getElementById("admin-login").style.display="block";
@@ -569,37 +586,79 @@ function verificarAdmin() {
   if (document.getElementById("admin-pass").value===CFG.PASSWORD) {
     document.getElementById("admin-login").style.display="none";
     document.getElementById("admin-panel").style.display="block";
-    renderTablaAdmin();
+    cargarDesdeSheets();
   } else { document.getElementById("admin-error").style.display="block"; }
 }
+
+async function cargarDesdeSheets() {
+  document.getElementById("admin-cargando").style.display="block";
+  document.getElementById("admin-tabla").innerHTML="";
+  document.getElementById("admin-resumen").innerHTML="";
+  try {
+    const url = CFG.SCRIPT_URL + "?action=get&app=ana";
+    const resp = await fetch(url);
+    const json = await resp.json();
+    datosSheets = (json.status==="ok" && Array.isArray(json.datos)) ? json.datos : [];
+  } catch(e) { datosSheets=[]; console.log("Error Sheets:",e); }
+  document.getElementById("admin-cargando").style.display="none";
+  poblarFiltroEstudiantes();
+  renderTablaAdmin();
+}
+
+function poblarFiltroEstudiantes() {
+  const nombres=[...new Set(datosSheets.map(r=>r.nombre))].filter(Boolean).sort();
+  const sel=document.getElementById("admin-filtro-est");
+  const va=sel.value;
+  sel.innerHTML='<option value="">Todos los estudiantes</option>';
+  nombres.forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;if(n===va)o.selected=true;sel.appendChild(o);});
+}
+
 function renderTablaAdmin() {
   const f=document.getElementById("admin-filtro").value;
-  let datos=app.registros;
+  const fe=document.getElementById("admin-filtro-est").value;
+  let datos=[...datosSheets];
   if(f) datos=datos.filter(r=>r.tipo===f);
-  if(!datos.length){document.getElementById("admin-tabla").innerHTML=`<p style="font-size:14px;color:#64748b;text-align:center;padding:20px">No hay registros aún.</p>`;return;}
+  if(fe) datos=datos.filter(r=>r.nombre===fe);
+  const resumen=document.getElementById("admin-resumen");
+  if(fe){
+    const anas=datos.filter(r=>r.tipo==="anamnesis").length;
+    const tipos=[...new Set(datos.map(r=>r.tipo))];
+    resumen.innerHTML=`<div style="background:var(--azul3);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--azul)">
+      <strong>${fe}</strong> — ${datos.length} registro(s) | Anamnesis completadas: <strong>${anas}/3</strong> | Actividades: ${tipos.join(", ")||"ninguna"}
+    </div>`;
+  } else {
+    const total=datosSheets.length;
+    const ests=new Set(datosSheets.map(r=>r.nombre)).size;
+    resumen.innerHTML=`<div style="background:var(--azul3);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--azul)">
+      Total registros: <strong>${total}</strong> | Estudiantes activos: <strong>${ests}</strong>
+      ${!total?' — <em>Haz clic en 🔄 Actualizar para cargar los datos</em>':''}
+    </div>`;
+  }
+  if(!datos.length){document.getElementById("admin-tabla").innerHTML=`<p style="font-size:14px;color:#64748b;text-align:center;padding:20px">No hay registros para este filtro.</p>`;return;}
   let h=`<table class="at"><thead><tr><th>Fecha</th><th>Estudiante</th><th>Tipo</th><th>Detalle</th><th>Link Evidencias</th></tr></thead><tbody>`;
   datos.forEach(r=>{
     let det="";
-    if(r.tipo==="anamnesis") det=`Sesión ${r.sesion} | Pte: ${r.nombre_paciente||"-"} | ${(r.motivo||"").substring(0,50)}...`;
-    else det=`Puntaje: ${r.puntaje} (${r.porcentaje})`;
+    if(r.tipo==="anamnesis") det=`Ses. ${r.sesion||""} | Pte: ${r.nombre_paciente||"-"} | ${(r.motivo||"").substring(0,50)}...`;
+    else det=`Puntaje: ${r.puntaje||""} (${r.porcentaje||""})`;
     const lnk=r.link_evidencias?`<a href="${r.link_evidencias}" target="_blank" style="color:var(--azul2);font-size:12px">Ver →</a>`:"-";
-    h+=`<tr><td style="white-space:nowrap;font-size:11px">${r.fecha}</td><td><strong>${r.nombre}</strong></td>
-    <td><span class="badge ${r.tipo==="anamnesis"?"badge-verde":r.tipo==="quiz"?"badge-naranja":"badge-morado"}">${r.tipo}</span></td>
+    h+=`<tr><td style="white-space:nowrap;font-size:11px">${r.fecha||""}</td><td><strong>${r.nombre||""}</strong></td>
+    <td><span class="badge ${r.tipo==="anamnesis"?"badge-verde":r.tipo==="quiz"?"badge-naranja":"badge-morado"}">${r.tipo||""}</span></td>
     <td style="font-size:12px">${det}</td><td>${lnk}</td></tr>`;
   });
   h+=`</tbody></table>`;
   document.getElementById("admin-tabla").innerHTML=h;
 }
+
 function exportarCSV() {
-  const datos=app.registros;
-  if(!datos.length){alert("No hay datos.");return;}
+  if(!datosSheets.length){alert("No hay datos. Haz clic en Actualizar primero.");return;}
   const cols=["fecha","nombre","tipo","sesion","nombre_paciente","motivo","link_evidencias","puntaje","porcentaje"];
   let csv=cols.join(",")+"\n";
-  datos.forEach(r=>{csv+=cols.map(c=>`"${(r[c]||"").toString().replace(/"/g,"'")}""`).join(",")+"\n";});
+  datosSheets.forEach(r=>{csv+=cols.map(c=>`"${(r[c]||"").toString().replace(/"/g,"'")}"`).join(",")+"\n";});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
   a.download="anamnesis_psicodiagnostico.csv"; a.click();
 }
+
 async function enviarSheets(data) {
   if(CFG.SCRIPT_URL==="PEGAR_URL_AQUI") return;
   try { await fetch(CFG.SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)}); } catch(e){}
